@@ -1,7 +1,13 @@
 FROM php:8.2-apache
 
-# ติดตั้งส่วนขยาย PDO MySQL และ mysqli สำหรับเชื่อมต่อฐานข้อมูล
+# ติดตั้ง extensions
 RUN docker-php-ext-install pdo_mysql mysqli
 
-# เปิดใช้งาน mod_rewrite ของ Apache (เผื่อใช้ทำ Clean URL ในอนาคต)
+# เปิด mod_rewrite
 RUN a2enmod rewrite
+
+# 👉 สำคัญมาก: เอาไฟล์เว็บเข้า Apache folder
+COPY . /var/www/html
+
+# ตั้ง permission (กัน 403)
+RUN chown -R www-data:www-data /var/www/html
