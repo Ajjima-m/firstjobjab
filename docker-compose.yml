@@ -1,5 +1,4 @@
 services:
-  # Web Server (PHP + Apache)
   web:
     build: .
     container_name: job_tracker_web
@@ -9,13 +8,9 @@ services:
       - ./src:/var/www/html
     depends_on:
       - db
-    networks:
-      - job_tracker_network
 
-  # Database Server (MySQL)
   db:
     image: mysql:8.0
-    container_name: job_tracker_db
     restart: always
     environment:
       MYSQL_DATABASE: job_tracker
@@ -26,14 +21,9 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - job_tracker_network
 
-  # Database Management (phpMyAdmin)
   phpmyadmin:
     image: phpmyadmin:5.2
-    container_name: job_tracker_pma
     restart: always
     environment:
       PMA_HOST: db
@@ -43,12 +33,6 @@ services:
       - "8082:80"
     depends_on:
       - db
-    networks:
-      - job_tracker_network
 
 volumes:
   db_data:
-
-networks:
-  job_tracker_network:
-    driver: bridge

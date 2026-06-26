@@ -1,16 +1,24 @@
 <?php
-// src/config.php
 if (session_status() === PHP_SESSION_NONE) {
-    session_start(); // เปิดใช้งาน Session ทุกครั้งที่เรียกใช้ไฟล์นี้
+    session_start();
 }
 
-$host = 'db';
-$db   = 'job_tracker';
-$user = 'tracker_user';
-$pass = 'tracker_password_123';
+/*
+  🧠 ใช้แบบนี้:
+  - local (docker-compose) → db
+  - server (Render) → ENV
+*/
+
+$host = getenv('DB_HOST') ?: 'db';
+$db   = getenv('DB_NAME') ?: 'job_tracker';
+$user = getenv('DB_USER') ?: 'tracker_user';
+$pass = getenv('DB_PASS') ?: 'tracker_password_123';
 $charset = 'utf8mb4';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$port = getenv('DB_PORT') ?: 3306;
+
+$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
+
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -18,7 +26,7 @@ $options = [
 ];
 
 try {
-     $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-     die("เชื่อมต่อฐานข้อมูลล้มเหลว: " . $e->getMessage());
+    $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (PDOException $e) {
+    die("เชื่อมต่อฐานข้อมูลล้มเหลว: " . $e->getMessage());
 }
