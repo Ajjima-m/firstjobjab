@@ -1,0 +1,54 @@
+services:
+  # Web Server (PHP + Apache)
+  web:
+    build: .
+    container_name: job_tracker_web
+    ports:
+      - "8081:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - job_tracker_network
+
+  # Database Server (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: job_tracker_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: job_tracker
+      MYSQL_ROOT_PASSWORD: root_password_123
+      MYSQL_USER: tracker_user
+      MYSQL_PASSWORD: tracker_password_123
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - job_tracker_network
+
+  # Database Management (phpMyAdmin)
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    container_name: job_tracker_pma
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root_password_123
+    ports:
+      - "8082:80"
+    depends_on:
+      - db
+    networks:
+      - job_tracker_network
+
+volumes:
+  db_data:
+
+networks:
+  job_tracker_network:
+    driver: bridge
